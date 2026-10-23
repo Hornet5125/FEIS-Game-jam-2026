@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: 89d2a17b8af949a9bc42767bac3a5c09
+timeCreated: 1732656480
+AssetOrigin:
+  serializedVersion: 1
+  productId: 331520
+  packageName: Git (Anchorpoint) plugin for Unity
+  packageVersion: 1.0.9
+  assetPath: Packages/com.anchorpoint.sourcecontrol/Editor/Anchorpoint/Scripts/Wrapper/PluginInitializer.cs
+  uploadId: 948018

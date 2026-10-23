@@ -1,5 +1,14 @@
 {
   "dependencies": {
+    "com.anchorpoint.sourcecontrol": {
+      "version": "file:com.anchorpoint.sourcecontrol",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {
+        "com.unity.nuget.newtonsoft-json": "3.2.1",
+        "com.unity.editorcoroutines": "1.0.0"
+      }
+    },
     "com.unity.2d.animation": {
       "version": "16.0.1",
       "depth": 0,

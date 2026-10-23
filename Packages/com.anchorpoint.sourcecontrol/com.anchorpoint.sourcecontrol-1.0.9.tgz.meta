@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 4a4b0a1e06373f1408975b3c9470e058
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 331520
+  packageName: Git (Anchorpoint) plugin for Unity
+  packageVersion: 1.0.9
+  assetPath: Packages/com.anchorpoint.sourcecontrol/com.anchorpoint.sourcecontrol-1.0.9.tgz
+  uploadId: 948018

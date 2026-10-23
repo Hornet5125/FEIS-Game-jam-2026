@@ -1,0 +1,9 @@
+fileFormatVersion: 2
+guid: 54e9bc1b31dd44b4fa3516333e61835f
+AssetOrigin:
+  serializedVersion: 1
+  productId: 331520
+  packageName: Git (Anchorpoint) plugin for Unity
+  packageVersion: 1.0.9
+  assetPath: Packages/com.anchorpoint.sourcecontrol/Editor/Anchorpoint/Scripts/Wrapper/ProcessTracker.cs
+  uploadId: 948018

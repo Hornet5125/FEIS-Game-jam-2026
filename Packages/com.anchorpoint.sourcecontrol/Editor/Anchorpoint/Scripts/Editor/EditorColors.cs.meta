@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: 278492a31c514a3cad8d1361718ee4d8
+timeCreated: 1745060462
+AssetOrigin:
+  serializedVersion: 1
+  productId: 331520
+  packageName: Git (Anchorpoint) plugin for Unity
+  packageVersion: 1.0.9
+  assetPath: Packages/com.anchorpoint.sourcecontrol/Editor/Anchorpoint/Scripts/Editor/EditorColors.cs
+  uploadId: 948018

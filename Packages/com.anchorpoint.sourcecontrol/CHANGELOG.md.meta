@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: f64b07ee4084a4849841e7ffffbf5f9c
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 331520
+  packageName: Git (Anchorpoint) plugin for Unity
+  packageVersion: 1.0.9
+  assetPath: Packages/com.anchorpoint.sourcecontrol/CHANGELOG.md
+  uploadId: 948018

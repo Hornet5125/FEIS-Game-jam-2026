@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: 9fa0d888edce4ffb8b7a14413c1888b0
+timeCreated: 1737827654
+AssetOrigin:
+  serializedVersion: 1
+  productId: 331520
+  packageName: Git (Anchorpoint) plugin for Unity
+  packageVersion: 1.0.9
+  assetPath: Packages/com.anchorpoint.sourcecontrol/Editor/Anchorpoint/Scripts/Wrapper/ConnectMessage.cs
+  uploadId: 948018

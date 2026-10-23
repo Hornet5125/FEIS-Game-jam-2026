@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 05a93756c3a4e644982026122b4fdefc
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 331520
+  packageName: Git (Anchorpoint) plugin for Unity
+  packageVersion: 1.0.9
+  assetPath: Packages/com.anchorpoint.sourcecontrol/Editor/Anchorpoint/Scripts/Config/CLIConfig.cs
+  uploadId: 948018

@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: 1ba244ffe9eb42e1a60c8a4f87fb3f03
+timeCreated: 1732638724
+AssetOrigin:
+  serializedVersion: 1
+  productId: 331520
+  packageName: Git (Anchorpoint) plugin for Unity
+  packageVersion: 1.0.9
+  assetPath: Packages/com.anchorpoint.sourcecontrol/Editor/Anchorpoint/Scripts/Wrapper/ConnectCommandHandler.cs
+  uploadId: 948018
