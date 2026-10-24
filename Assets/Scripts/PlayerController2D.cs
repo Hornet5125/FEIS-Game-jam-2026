@@ -21,7 +21,7 @@ public class PlayerController2D : MonoBehaviour
 
     [Header("Ground Check")]
     [SerializeField] private LayerMask groundLayer;
-    [SerializeField] private float groundCheckDistance = 0.08f;
+    [SerializeField] private float groundCheckDistance = 0.12f;
 
     [Header("Dash")]
     [SerializeField] private float dashSpeed = 18f;
@@ -37,7 +37,9 @@ public class PlayerController2D : MonoBehaviour
     private float originalGravityScale;
 
     private int facingDirection = 1;
+
     private bool isGrounded;
+    private bool wasGrounded;
     private bool isDashing;
     private bool canDash = true;
 
@@ -51,7 +53,6 @@ public class PlayerController2D : MonoBehaviour
         originalGravityScale = rb.gravityScale;
     }
 
-    
     private void Update()
     {
         moveInput = Input.GetAxisRaw("Horizontal");
@@ -61,7 +62,6 @@ public class PlayerController2D : MonoBehaviour
             facingDirection = moveInput > 0 ? 1 : -1;
         }
 
-        // Запоминаем нажатие прыжка.
         if (Input.GetKeyDown(KeyCode.Space))
         {
             jumpBufferCounter = jumpBufferTime;
@@ -71,7 +71,6 @@ public class PlayerController2D : MonoBehaviour
             jumpBufferCounter -= Time.deltaTime;
         }
 
-        // Если отпустить прыжок раньше, прыжок будет ниже.
         if (Input.GetKeyUp(KeyCode.Space) && rb.linearVelocity.y > 0f)
         {
             rb.linearVelocity = new Vector2(
@@ -80,7 +79,6 @@ public class PlayerController2D : MonoBehaviour
             );
         }
 
-        // Dash доступен только в воздухе.
         if (Input.GetKeyDown(KeyCode.LeftShift)
             && !isGrounded
             && canDash
@@ -100,12 +98,21 @@ public class PlayerController2D : MonoBehaviour
         }
     }
 
-    
     private void FixedUpdate()
     {
+        wasGrounded = isGrounded;
+
+        // Проверяем землю перед расчётом движения.
         CheckGrounded();
 
-        // Coyote time и восстановление dash после приземления.
+        // Переносим игрока на расстояние, которое прошла платформа.
+        if (currentPlatform != null && !isDashing)
+        {
+            rb.position += currentPlatform.PlatformDelta;
+            CheckGrounded();
+        }
+
+        // Обновляем таймеры прыжка и восстанавливаем dash.
         if (isGrounded)
         {
             coyoteCounter = coyoteTime;
@@ -116,6 +123,12 @@ public class PlayerController2D : MonoBehaviour
             coyoteCounter -= Time.fixedDeltaTime;
         }
 
+        // Если игрок оторвался от платформы, больше не переносим его.
+        if (!isGrounded && wasGrounded)
+        {
+            currentPlatform = null;
+        }
+
         // Во время dash движение контролируется самим dash.
         if (isDashing)
         {
@@ -123,50 +136,7 @@ public class PlayerController2D : MonoBehaviour
             return;
         }
 
-        // Движение и ускорение на земле.
-        if (isGrounded)
-        {
-            bool isSprinting = Input.GetKey(KeyCode.LeftShift);
-
-            float targetMaxSpeed = isSprinting
-                ? sprintSpeed
-                : maxSpeed;
-
-            float desiredSpeed = moveInput * targetMaxSpeed;
-
-            float movementRate = Mathf.Abs(moveInput) > 0.01f
-                ? acceleration
-                : deceleration;
-
-            float calculatedSpeed = Mathf.MoveTowards(
-                rb.linearVelocity.x,
-                desiredSpeed,
-                movementRate * Time.fixedDeltaTime
-            );
-
-            rb.linearVelocity = new Vector2(
-                calculatedSpeed,
-                rb.linearVelocity.y
-            );
-        }
-        // В воздухе сохраняем обычное управление по горизонтали.
-        else
-        {
-            float desiredSpeed = moveInput * maxSpeed;
-
-            float calculatedSpeed = Mathf.MoveTowards(
-                rb.linearVelocity.x,
-                desiredSpeed,
-                acceleration * Time.fixedDeltaTime
-            );
-
-            rb.linearVelocity = new Vector2(
-                calculatedSpeed,
-                rb.linearVelocity.y
-            );
-        }
-
-        // Прыжок с jump buffer и coyote time.
+        // Прыжок обрабатываем до обычного движения.
         if (jumpBufferCounter > 0f && coyoteCounter > 0f)
         {
             rb.linearVelocity = new Vector2(
@@ -176,9 +146,33 @@ public class PlayerController2D : MonoBehaviour
 
             jumpBufferCounter = 0f;
             coyoteCounter = 0f;
+            isGrounded = false;
+            currentPlatform = null;
         }
-    }
 
+        // Горизонтальное движение.
+        float targetMaxSpeed = isGrounded
+            && Input.GetKey(KeyCode.LeftShift)
+            ? sprintSpeed
+            : maxSpeed;
+
+        float desiredSpeed = moveInput * targetMaxSpeed;
+
+        float movementRate = Mathf.Abs(moveInput) > 0.01f
+            ? acceleration
+            : deceleration;
+
+        float calculatedSpeed = Mathf.MoveTowards(
+            rb.linearVelocity.x,
+            desiredSpeed,
+            movementRate * Time.fixedDeltaTime
+        );
+
+        rb.linearVelocity = new Vector2(
+            calculatedSpeed,
+            rb.linearVelocity.y
+        );
+    }
 
     private void CheckGrounded()
     {
@@ -209,7 +203,6 @@ public class PlayerController2D : MonoBehaviour
             Input.GetAxisRaw("Vertical")
         );
 
-        // Dash forward if no direction is pressed.
         if (dashDirection.sqrMagnitude < 0.01f)
         {
             dashDirection = new Vector2(facingDirection, 0f);
@@ -221,7 +214,8 @@ public class PlayerController2D : MonoBehaviour
         canDash = false;
         dashCounter = dashDuration;
 
-        // Disable gravity while dashing.
+        currentPlatform = null;
+
         rb.gravityScale = 0f;
         rb.linearVelocity = dashDirection * dashSpeed;
     }
@@ -230,9 +224,48 @@ public class PlayerController2D : MonoBehaviour
     {
         isDashing = false;
         rb.gravityScale = originalGravityScale;
-
-        // Stop the dash's momentum. Gravity takes over afterward.
         rb.linearVelocity = Vector2.zero;
+    }
+
+    private void OnCollisionStay2D(Collision2D collision)
+    {
+        MovingPlatform platform =
+            collision.collider.GetComponent<MovingPlatform>();
+
+        if (platform == null)
+        {
+            platform = collision.collider
+                .GetComponentInParent<MovingPlatform>();
+        }
+
+        if (platform == null)
+            return;
+
+        foreach (ContactPoint2D contact in collision.contacts)
+        {
+            if (contact.normal.y > 0.5f)
+            {
+                currentPlatform = platform;
+                return;
+            }
+        }
+    }
+
+    private void OnCollisionExit2D(Collision2D collision)
+    {
+        MovingPlatform platform =
+            collision.collider.GetComponent<MovingPlatform>();
+
+        if (platform == null)
+        {
+            platform = collision.collider
+                .GetComponentInParent<MovingPlatform>();
+        }
+
+        if (platform != null && currentPlatform == platform)
+        {
+            currentPlatform = null;
+        }
     }
 
     private void OnDisable()
@@ -248,9 +281,7 @@ public class PlayerController2D : MonoBehaviour
         BoxCollider2D box = GetComponent<BoxCollider2D>();
 
         if (box == null)
-        {
             return;
-        }
 
         Bounds bounds = box.bounds;
 
