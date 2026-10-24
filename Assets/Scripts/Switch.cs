@@ -1,26 +1,28 @@
 
 using UnityEngine;
+using UnityEngine.Events;
 
 public class Switch : MonoBehaviour
 {
-    [SerializeField] private Door targetDoor;
+    [Header("Switch Settings")]
+    [SerializeField] private UnityEvent onActivate;
+    [SerializeField] private UnityEvent onDeactivate;
 
     private bool isActivated;
 
     public void Interact()
     {
-        if (targetDoor == null)
-        {
-            Debug.LogWarning("Switch: Door is not assigned!");
-            return;
-        }
-
-        targetDoor.ToggleDoor();
-
         isActivated = !isActivated;
 
-        Debug.Log(isActivated
-            ? "Switch activated!"
-            : "Switch deactivated!");
+        if (isActivated)
+        {
+            onActivate.Invoke();
+            Debug.Log("Switch activated!");
+        }
+        else
+        {
+            onDeactivate.Invoke();
+            Debug.Log("Switch deactivated!");
+        }
     }
 }
