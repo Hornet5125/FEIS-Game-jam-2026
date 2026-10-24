@@ -10,6 +10,9 @@ public class PlayerController2D : MonoBehaviour
     [SerializeField] private float acceleration = 70f;
     [SerializeField] private float deceleration = 90f;
 
+    [Header("Sprint")]
+    [SerializeField] private float sprintSpeed = 13f;
+
     [Header("Jump")]
     [SerializeField] private float jumpForce = 15f;
     [SerializeField] private float coyoteTime = 0.10f;
@@ -48,9 +51,9 @@ public class PlayerController2D : MonoBehaviour
         originalGravityScale = rb.gravityScale;
     }
 
+    
     private void Update()
     {
-        // Read horizontal input: A/D or arrow keys.
         moveInput = Input.GetAxisRaw("Horizontal");
 
         if (moveInput != 0)
@@ -58,7 +61,7 @@ public class PlayerController2D : MonoBehaviour
             facingDirection = moveInput > 0 ? 1 : -1;
         }
 
-        // Remember a jump press for a short time.
+        // Запоминаем нажатие прыжка.
         if (Input.GetKeyDown(KeyCode.Space))
         {
             jumpBufferCounter = jumpBufferTime;
@@ -68,7 +71,7 @@ public class PlayerController2D : MonoBehaviour
             jumpBufferCounter -= Time.deltaTime;
         }
 
-        // Reduce jump height when the player releases Space early.
+        // Если отпустить прыжок раньше, прыжок будет ниже.
         if (Input.GetKeyUp(KeyCode.Space) && rb.linearVelocity.y > 0f)
         {
             rb.linearVelocity = new Vector2(
@@ -77,7 +80,11 @@ public class PlayerController2D : MonoBehaviour
             );
         }
 
-        if (Input.GetKeyDown(KeyCode.LeftShift) && canDash && !isDashing)
+        // Dash доступен только в воздухе.
+        if (Input.GetKeyDown(KeyCode.LeftShift)
+            && !isGrounded
+            && canDash
+            && !isDashing)
         {
             StartDash();
         }
@@ -93,11 +100,12 @@ public class PlayerController2D : MonoBehaviour
         }
     }
 
+    
     private void FixedUpdate()
     {
         CheckGrounded();
 
-        // Coyote time: allow jumping just after leaving a ledge.
+        // Coyote time и восстановление dash после приземления.
         if (isGrounded)
         {
             coyoteCounter = coyoteTime;
@@ -108,27 +116,57 @@ public class PlayerController2D : MonoBehaviour
             coyoteCounter -= Time.fixedDeltaTime;
         }
 
+        // Во время dash движение контролируется самим dash.
         if (isDashing)
         {
             rb.linearVelocity = dashDirection * dashSpeed;
             return;
         }
 
-        // Smoothly accelerate and decelerate horizontally.
-        float targetSpeed = moveInput * maxSpeed;
-        float rate = Mathf.Abs(moveInput) > 0.01f
-            ? acceleration
-            : deceleration;
+        // Движение и ускорение на земле.
+        if (isGrounded)
+        {
+            bool isSprinting = Input.GetKey(KeyCode.LeftShift);
 
-        float newSpeed = Mathf.MoveTowards(
-            rb.linearVelocity.x,
-            targetSpeed,
-            rate * Time.fixedDeltaTime
-        );
+            float targetMaxSpeed = isSprinting
+                ? sprintSpeed
+                : maxSpeed;
 
-        rb.linearVelocity = new Vector2(newSpeed, rb.linearVelocity.y);
+            float desiredSpeed = moveInput * targetMaxSpeed;
 
-        // Jump buffer + coyote time.
+            float movementRate = Mathf.Abs(moveInput) > 0.01f
+                ? acceleration
+                : deceleration;
+
+            float calculatedSpeed = Mathf.MoveTowards(
+                rb.linearVelocity.x,
+                desiredSpeed,
+                movementRate * Time.fixedDeltaTime
+            );
+
+            rb.linearVelocity = new Vector2(
+                calculatedSpeed,
+                rb.linearVelocity.y
+            );
+        }
+        // В воздухе сохраняем обычное управление по горизонтали.
+        else
+        {
+            float desiredSpeed = moveInput * maxSpeed;
+
+            float calculatedSpeed = Mathf.MoveTowards(
+                rb.linearVelocity.x,
+                desiredSpeed,
+                acceleration * Time.fixedDeltaTime
+            );
+
+            rb.linearVelocity = new Vector2(
+                calculatedSpeed,
+                rb.linearVelocity.y
+            );
+        }
+
+        // Прыжок с jump buffer и coyote time.
         if (jumpBufferCounter > 0f && coyoteCounter > 0f)
         {
             rb.linearVelocity = new Vector2(
@@ -140,6 +178,7 @@ public class PlayerController2D : MonoBehaviour
             coyoteCounter = 0f;
         }
     }
+
 
     private void CheckGrounded()
     {

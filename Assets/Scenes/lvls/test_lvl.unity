@@ -130,7 +130,7 @@ GameObject:
   - component: {fileID: 264632994}
   - component: {fileID: 264632993}
   - component: {fileID: 264632992}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Ground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -362,6 +362,7 @@ GameObject:
   - component: {fileID: 1889512735}
   - component: {fileID: 1889512734}
   - component: {fileID: 1889512733}
+  - component: {fileID: 1889512737}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -511,12 +512,37 @@ Transform:
   m_GameObject: {fileID: 1889512732}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.53, y: 3.18, z: 0}
+  m_LocalPosition: {x: 0.04, y: 3.24, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1889512737
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1889512732}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31abe13c1f88a107d8cbb0829d3bde59, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerController2D
+  maxSpeed: 8
+  acceleration: 70
+  deceleration: 90
+  jumpForce: 15
+  coyoteTime: 0.1
+  jumpBufferTime: 0.12
+  jumpCutMultiplier: 0.5
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  groundCheckDistance: 0.08
+  dashSpeed: 18
+  dashDuration: 0.15
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
