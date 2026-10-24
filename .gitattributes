@@ -54,7 +54,7 @@
 # *** КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ ***
 # .meta файлы Unity часто содержат бинарные заголовки. 
 # Принудительно делаем их бинарными, чтобы Git не ломал их на Linux.
-*.meta                  binary
+*.meta                  text eol=lf
 
 # "physic" for 3D but "physics" for 2D
 *.physicMaterial        unity-yaml
