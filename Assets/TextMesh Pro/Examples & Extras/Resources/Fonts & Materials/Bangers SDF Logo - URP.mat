@@ -134,7 +134,7 @@ Material:
     - _MaskCoord: {r: 0, g: 0, b: 0, a: 0}
     - _OutlineColor: {r: 1, g: 1, b: 1, a: 1}
     - _OutlineColor1: {r: 1, g: 1, b: 1, a: 1}
-    - _OutlineColor2: {r: 0.95979345, g: 1, b: 0.007843137, a: 1}
+    - _OutlineColor2: {r: 0.9339623, g: 0.69166076, b: 0.84778297, a: 1}
     - _OutlineColor3: {r: 0, g: 0, b: 0, a: 1}
     - _OutlineOffset1: {r: 0, g: 0, b: 0, a: 0}
     - _OutlineOffset2: {r: 0, g: 0, b: 0, a: 0}
