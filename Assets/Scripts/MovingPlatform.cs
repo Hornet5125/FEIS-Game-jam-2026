@@ -1,21 +1,21 @@
-
 using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody2D))]
+[DefaultExecutionOrder(-100)]
+[RequireComponent(typeof(Rigidbody2D), typeof(Collider2D))]
 public class MovingPlatform : MonoBehaviour
 {
-    [Header("Movement")]
-    [SerializeField] private Vector3 pointA = new Vector3(-3f, 0f, 0f);
-    [SerializeField] private Vector3 pointB = new Vector3(3f, 0f, 0f);
-    [SerializeField] private float speed = 2f;
+    [Header("Movement relative to starting position")]
+    [SerializeField] private Vector2 pointA = new Vector2(-3f, 0f);
+    [SerializeField] private Vector2 pointB = new Vector2(3f, 0f);
+    [SerializeField, Min(0.01f)] private float speed = 2f;
+    [SerializeField, Min(0f)] private float pauseAtPoint = 0f;
 
     private Rigidbody2D rb;
     private Vector2 worldPointA;
     private Vector2 worldPointB;
     private Vector2 targetPosition;
-
-    private Vector2 lastPosition;
     private Vector2 platformDelta;
+    private float pauseTimer;
 
     public Vector2 PlatformDelta => platformDelta;
 
@@ -26,34 +26,34 @@ public class MovingPlatform : MonoBehaviour
 
     private void Start()
     {
-        Vector2 startPosition = rb.position;
-
-        worldPointA = startPosition + (Vector2)pointA;
-        worldPointB = startPosition + (Vector2)pointB;
-
+        Vector2 start = rb.position;
+        worldPointA = start + pointA;
+        worldPointB = start + pointB;
+        // Move from the placed position toward B first, then alternate A/B.
         targetPosition = worldPointB;
-        lastPosition = rb.position;
     }
 
     private void FixedUpdate()
     {
-        lastPosition = rb.position;
+        Vector2 previous = rb.position;
 
-        Vector2 nextPosition = Vector2.MoveTowards(
-            rb.position,
-            targetPosition,
-            speed * Time.fixedDeltaTime
-        );
-
-        rb.MovePosition(nextPosition);
-
-        platformDelta = nextPosition - lastPosition;
-
-        if (Vector2.Distance(nextPosition, targetPosition) < 0.01f)
+        if (pauseTimer > 0f)
         {
-            targetPosition = targetPosition == worldPointA
+            pauseTimer -= Time.fixedDeltaTime;
+            platformDelta = Vector2.zero;
+            return;
+        }
+
+        Vector2 next = Vector2.MoveTowards(previous, targetPosition, speed * Time.fixedDeltaTime);
+        rb.MovePosition(next);
+        platformDelta = next - previous;
+
+        if ((next - targetPosition).sqrMagnitude < 0.0001f)
+        {
+            targetPosition = (targetPosition - worldPointA).sqrMagnitude < 0.0001f
                 ? worldPointB
                 : worldPointA;
+            pauseTimer = pauseAtPoint;
         }
     }
 }

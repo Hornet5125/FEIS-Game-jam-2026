@@ -1,26 +1,16 @@
-
 using UnityEngine;
 
+/// <summary>
+/// Legacy script. Remove this component from the Player.
+/// Do not parent a Dynamic Rigidbody2D to a moving platform.
+/// PlayerController2D now handles platform carry.
+/// </summary>
+[DisallowMultipleComponent]
 public class PlatformPassenger : MonoBehaviour
 {
-    private Transform currentPlatform;
-
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void Awake()
     {
-        if (collision.gameObject.CompareTag("MovingPlatform"))
-        {
-            currentPlatform = collision.transform;
-            transform.SetParent(currentPlatform);
-        }
-    }
-
-    private void OnCollisionExit2D(Collision2D collision)
-    {
-        if (currentPlatform != null &&
-            collision.transform == currentPlatform)
-        {
-            transform.SetParent(null);
-            currentPlatform = null;
-        }
+        Debug.LogWarning("PlatformPassenger устарел: удали этот компонент с Player. Переносом занимается PlayerController2D.", this);
+        enabled = false;
     }
 }

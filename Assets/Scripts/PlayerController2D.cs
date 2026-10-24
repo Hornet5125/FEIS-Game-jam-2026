@@ -1,27 +1,25 @@
 
 using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody2D))]
-[RequireComponent(typeof(BoxCollider2D))]
+[RequireComponent(typeof(Rigidbody2D), typeof(BoxCollider2D))]
 public class PlayerController2D : MonoBehaviour
 {
     [Header("Movement")]
     [SerializeField] private float maxSpeed = 8f;
     [SerializeField] private float acceleration = 70f;
-    [SerializeField] private float deceleration = 90f;
-
-    [Header("Sprint")]
+    [SerializeField] private float deceleration = 1000f;
     [SerializeField] private float sprintSpeed = 13f;
 
     [Header("Jump")]
     [SerializeField] private float jumpForce = 15f;
     [SerializeField] private float coyoteTime = 0.10f;
     [SerializeField] private float jumpBufferTime = 0.12f;
-    [SerializeField] private float jumpCutMultiplier = 0.5f;
+    [SerializeField, Range(0.1f, 1f)]
+    private float jumpCutMultiplier = 0.5f;
 
     [Header("Ground Check")]
     [SerializeField] private LayerMask groundLayer;
-    [SerializeField] private float groundCheckDistance = 0.12f;
+    [SerializeField] private float groundCheckDistance = 0.14f;
 
     [Header("Dash")]
     [SerializeField] private float dashSpeed = 18f;
@@ -39,11 +37,11 @@ public class PlayerController2D : MonoBehaviour
     private int facingDirection = 1;
 
     private bool isGrounded;
-    private bool wasGrounded;
     private bool isDashing;
     private bool canDash = true;
 
     private Vector2 dashDirection;
+    private MovingPlatform currentPlatform;
 
     private void Awake()
     {
@@ -55,13 +53,15 @@ public class PlayerController2D : MonoBehaviour
 
     private void Update()
     {
+        // Получаем горизонтальный ввод.
         moveInput = Input.GetAxisRaw("Horizontal");
 
-        if (moveInput != 0)
+        if (moveInput != 0f)
         {
-            facingDirection = moveInput > 0 ? 1 : -1;
+            facingDirection = moveInput > 0f ? 1 : -1;
         }
 
+        // Буфер прыжка: позволяет нажать прыжок немного раньше приземления.
         if (Input.GetKeyDown(KeyCode.Space))
         {
             jumpBufferCounter = jumpBufferTime;
@@ -71,6 +71,7 @@ public class PlayerController2D : MonoBehaviour
             jumpBufferCounter -= Time.deltaTime;
         }
 
+        // Если отпустить прыжок раньше вершины, прыжок будет ниже.
         if (Input.GetKeyUp(KeyCode.Space) && rb.linearVelocity.y > 0f)
         {
             rb.linearVelocity = new Vector2(
@@ -79,6 +80,7 @@ public class PlayerController2D : MonoBehaviour
             );
         }
 
+        // Рывок в воздухе на Left Shift.
         if (Input.GetKeyDown(KeyCode.LeftShift)
             && !isGrounded
             && canDash
@@ -87,6 +89,7 @@ public class PlayerController2D : MonoBehaviour
             StartDash();
         }
 
+        // Отсчитываем длительность рывка.
         if (isDashing)
         {
             dashCounter -= Time.deltaTime;
@@ -100,19 +103,8 @@ public class PlayerController2D : MonoBehaviour
 
     private void FixedUpdate()
     {
-        wasGrounded = isGrounded;
-
-        // Проверяем землю перед расчётом движения.
         CheckGrounded();
 
-        // Переносим игрока на расстояние, которое прошла платформа.
-        if (currentPlatform != null && !isDashing)
-        {
-            rb.position += currentPlatform.PlatformDelta;
-            CheckGrounded();
-        }
-
-        // Обновляем таймеры прыжка и восстанавливаем dash.
         if (isGrounded)
         {
             coyoteCounter = coyoteTime;
@@ -123,20 +115,46 @@ public class PlayerController2D : MonoBehaviour
             coyoteCounter -= Time.fixedDeltaTime;
         }
 
-        // Если игрок оторвался от платформы, больше не переносим его.
-        if (!isGrounded && wasGrounded)
-        {
-            currentPlatform = null;
-        }
-
-        // Во время dash движение контролируется самим dash.
+        // Во время рывка не изменяем скорость движения.
         if (isDashing)
-        {
-            rb.linearVelocity = dashDirection * dashSpeed;
             return;
+
+        float targetSpeed = Input.GetKey(KeyCode.LeftControl)
+            ? sprintSpeed
+            : maxSpeed;
+
+        float desiredX = moveInput * targetSpeed;
+
+        if (Mathf.Abs(moveInput) > 0.01f)
+        {
+            // Движение при нажатии клавиш.
+            float x = Mathf.MoveTowards(
+                rb.linearVelocity.x,
+                desiredX,
+                acceleration * Time.fixedDeltaTime
+            );
+
+            rb.linearVelocity = new Vector2(
+                x,
+                rb.linearVelocity.y
+            );
+        }
+        else if (currentPlatform == null)
+        {
+            // Торможение, когда персонаж не на движущейся платформе.
+            float x = Mathf.MoveTowards(
+                rb.linearVelocity.x,
+                0f,
+                deceleration * Time.fixedDeltaTime
+            );
+
+            rb.linearVelocity = new Vector2(
+                x,
+                rb.linearVelocity.y
+            );
         }
 
-        // Прыжок обрабатываем до обычного движения.
+        // Прыжок с учётом буфера и времени схода с края.
         if (jumpBufferCounter > 0f && coyoteCounter > 0f)
         {
             rb.linearVelocity = new Vector2(
@@ -146,32 +164,7 @@ public class PlayerController2D : MonoBehaviour
 
             jumpBufferCounter = 0f;
             coyoteCounter = 0f;
-            isGrounded = false;
-            currentPlatform = null;
         }
-
-        // Горизонтальное движение.
-        float targetMaxSpeed = isGrounded
-            && Input.GetKey(KeyCode.LeftShift)
-            ? sprintSpeed
-            : maxSpeed;
-
-        float desiredSpeed = moveInput * targetMaxSpeed;
-
-        float movementRate = Mathf.Abs(moveInput) > 0.01f
-            ? acceleration
-            : deceleration;
-
-        float calculatedSpeed = Mathf.MoveTowards(
-            rb.linearVelocity.x,
-            desiredSpeed,
-            movementRate * Time.fixedDeltaTime
-        );
-
-        rb.linearVelocity = new Vector2(
-            calculatedSpeed,
-            rb.linearVelocity.y
-        );
     }
 
     private void CheckGrounded()
@@ -179,30 +172,32 @@ public class PlayerController2D : MonoBehaviour
         Bounds bounds = bodyCollider.bounds;
 
         Vector2 checkSize = new Vector2(
-            bounds.size.x * 0.85f,
+            Mathf.Max(0.02f, bounds.size.x * 0.85f),
             groundCheckDistance
         );
 
         Vector2 checkPosition = new Vector2(
             bounds.center.x,
-            bounds.min.y - groundCheckDistance * 0.5f
+            bounds.min.y - groundCheckDistance * 0.45f
         );
 
-        isGrounded = Physics2D.OverlapBox(
+        Collider2D hit = Physics2D.OverlapBox(
             checkPosition,
             checkSize,
             0f,
             groundLayer
-        ) != null;
+        );
+
+        isGrounded = hit != null;
     }
 
     private void StartDash()
     {
-        dashDirection = new Vector2(
-            Input.GetAxisRaw("Horizontal"),
-            Input.GetAxisRaw("Vertical")
-        );
+        float verticalInput = Input.GetAxisRaw("Vertical");
 
+        dashDirection = new Vector2(moveInput, verticalInput);
+
+        // Если направление не задано, рывок идёт вперёд.
         if (dashDirection.sqrMagnitude < 0.01f)
         {
             dashDirection = new Vector2(facingDirection, 0f);
@@ -214,8 +209,6 @@ public class PlayerController2D : MonoBehaviour
         canDash = false;
         dashCounter = dashDuration;
 
-        currentPlatform = null;
-
         rb.gravityScale = 0f;
         rb.linearVelocity = dashDirection * dashSpeed;
     }
@@ -223,20 +216,56 @@ public class PlayerController2D : MonoBehaviour
     private void StopDash()
     {
         isDashing = false;
+
         rb.gravityScale = originalGravityScale;
-        rb.linearVelocity = Vector2.zero;
+
+        rb.linearVelocity = new Vector2(
+            rb.linearVelocity.x,
+            0f
+        );
+    }
+
+    private void OnDisable()
+    {
+        // Не оставляем игрока без гравитации,
+        // если компонент отключили во время рывка.
+        if (rb != null)
+        {
+            rb.gravityScale = originalGravityScale;
+        }
+
+        isDashing = false;
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        BoxCollider2D box = GetComponent<BoxCollider2D>();
+
+        if (box == null)
+        {
+            return;
+        }
+
+        Bounds bounds = box.bounds;
+
+        Gizmos.color = Color.yellow;
+
+        Gizmos.DrawWireCube(
+            new Vector2(
+                bounds.center.x,
+                bounds.min.y - groundCheckDistance * 0.45f
+            ),
+            new Vector2(
+                Mathf.Max(0.02f, bounds.size.x * 0.85f),
+                groundCheckDistance
+            )
+        );
     }
 
     private void OnCollisionStay2D(Collision2D collision)
     {
         MovingPlatform platform =
-            collision.collider.GetComponent<MovingPlatform>();
-
-        if (platform == null)
-        {
-            platform = collision.collider
-                .GetComponentInParent<MovingPlatform>();
-        }
+            collision.gameObject.GetComponent<MovingPlatform>();
 
         if (platform == null)
             return;
@@ -254,48 +283,11 @@ public class PlayerController2D : MonoBehaviour
     private void OnCollisionExit2D(Collision2D collision)
     {
         MovingPlatform platform =
-            collision.collider.GetComponent<MovingPlatform>();
-
-        if (platform == null)
-        {
-            platform = collision.collider
-                .GetComponentInParent<MovingPlatform>();
-        }
+            collision.gameObject.GetComponent<MovingPlatform>();
 
         if (platform != null && currentPlatform == platform)
         {
             currentPlatform = null;
         }
-    }
-
-    private void OnDisable()
-    {
-        if (rb != null)
-        {
-            rb.gravityScale = originalGravityScale;
-        }
-    }
-
-    private void OnDrawGizmosSelected()
-    {
-        BoxCollider2D box = GetComponent<BoxCollider2D>();
-
-        if (box == null)
-            return;
-
-        Bounds bounds = box.bounds;
-
-        Vector2 checkSize = new Vector2(
-            bounds.size.x * 0.85f,
-            groundCheckDistance
-        );
-
-        Vector2 checkPosition = new Vector2(
-            bounds.center.x,
-            bounds.min.y - groundCheckDistance * 0.5f
-        );
-
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireCube(checkPosition, checkSize);
     }
 }
