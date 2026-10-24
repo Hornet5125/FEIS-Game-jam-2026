@@ -1,18 +1,8 @@
-# Unity .gitattributes Template
-# Source: https://github.com/gitattributes/gitattributes/blob/master/Unity.gitattributes
-# Last synced: 2026-02-04
-# License: MIT
-#
-# This template is maintained from the gitattributes/gitattributes repository
-# and distributed under MIT License.
-
-# Define macros (only works in top-level gitattributes files)
+# Unity .gitattributes Template (Fixed for Linux/Windows)
+# Define macros
 [attr]lfs               filter=lfs diff=lfs merge=lfs -text
 [attr]unity-json        eol=lf linguist-language=json
 [attr]unity-yaml        merge=unityyamlmerge eol=lf linguist-language=yaml
-
-# Optionally collapse Unity YAML files on GitHub diffs
-# [attr]unity-yaml        merge=unityyamlmerge text linguist-language=yaml linguist-generated
 
 # Unity source files
 *.cginc                 text
@@ -35,7 +25,7 @@
 *.uss                   text diff=css linguist-language=css
 *.uxml                  text linguist-language=xml linguist-detectable
 
-# Unity YAML files
+# Unity YAML files (EXCLUDING .meta)
 *.anim                  unity-yaml
 *.asset                 unity-yaml
 *.brush                 unity-yaml
@@ -47,7 +37,6 @@
 *.lighting              unity-yaml
 *.mask                  unity-yaml
 *.mat                   unity-yaml
-*.meta                  unity-yaml
 *.mixer                 unity-yaml
 *.overrideController    unity-yaml
 *.playable              unity-yaml
@@ -61,6 +50,11 @@
 *.spriteatlasv2         unity-yaml
 *.terrainlayer          unity-yaml
 *.unity                 unity-yaml
+
+# *** КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ ***
+# .meta файлы Unity часто содержат бинарные заголовки. 
+# Принудительно делаем их бинарными, чтобы Git не ломал их на Linux.
+*.meta                  binary
 
 # "physic" for 3D but "physics" for 2D
 *.physicMaterial        unity-yaml
