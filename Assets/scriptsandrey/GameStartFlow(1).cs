@@ -11,6 +11,7 @@ public class GameStartFlow : MonoBehaviour
 
     [Header("Buttons")]
     [SerializeField] private Button playButton;
+    [SerializeField] private Button continueButton;
     [SerializeField] private Button confirmButton;
     [SerializeField] private Button backButton;
 
@@ -22,8 +23,10 @@ public class GameStartFlow : MonoBehaviour
     [SerializeField] private string gameSceneName = "game";
 
     private const string NameKey = "CharacterName";
+    private const string HasGameKey = "HasStartedGame";
 
     public static string CharacterName => PlayerPrefs.GetString(NameKey, "");
+    public static bool HasStartedGame => PlayerPrefs.GetInt(HasGameKey, 0) == 1;
 
     private void Start()
     {
@@ -37,18 +40,22 @@ public class GameStartFlow : MonoBehaviour
 
         if (nameInput != null)
         {
-            nameInput.SetTextWithoutNotify(CharacterName);
+            nameInput.SetTextWithoutNotify("");
             nameInput.onValueChanged.AddListener(OnNameChanged);
         }
 
         if (playButton != null) playButton.onClick.AddListener(OpenNameMenu);
+        if (continueButton != null) continueButton.onClick.AddListener(ContinueGame);
         if (confirmButton != null) confirmButton.onClick.AddListener(ConfirmNameAndStart);
         if (backButton != null) backButton.onClick.AddListener(BackToMainMenu);
+
         UpdateConfirmButton();
+        UpdateContinueButton();
     }
 
     private void OpenNameMenu()
     {
+        if (nameInput != null) nameInput.SetTextWithoutNotify("");
         if (mainMenu != null) mainMenu.SetActive(false);
         if (nameMenu != null) nameMenu.SetActive(true);
         if (errorText != null) errorText.gameObject.SetActive(false);
@@ -61,6 +68,7 @@ public class GameStartFlow : MonoBehaviour
         if (nameMenu != null) nameMenu.SetActive(false);
         if (mainMenu != null) mainMenu.SetActive(true);
         if (errorText != null) errorText.gameObject.SetActive(false);
+        UpdateContinueButton();
     }
 
     private void OnNameChanged(string value)
@@ -75,6 +83,12 @@ public class GameStartFlow : MonoBehaviour
             confirmButton.interactable = nameInput != null && !string.IsNullOrWhiteSpace(nameInput.text);
     }
 
+    private void UpdateContinueButton()
+    {
+        if (continueButton != null)
+            continueButton.interactable = HasStartedGame && !string.IsNullOrWhiteSpace(CharacterName);
+    }
+
     public void ConfirmNameAndStart()
     {
         string newName = nameInput != null ? nameInput.text.Trim() : "";
@@ -85,14 +99,36 @@ public class GameStartFlow : MonoBehaviour
             return;
         }
 
-        if (!Application.CanStreamedLevelBeLoaded(gameSceneName))
+        if (!CheckGameScene()) return;
+
+        PlayerPrefs.SetString(NameKey, newName);
+        PlayerPrefs.SetInt(HasGameKey, 1);
+        PlayerPrefs.Save();
+        LoadGameScene();
+    }
+
+    public void ContinueGame()
+    {
+        if (!HasStartedGame || string.IsNullOrWhiteSpace(CharacterName))
         {
-            ShowError("Сцена '" + gameSceneName + "' не добавлена в Build Profiles.");
+            ShowError("Нет ранее начатой игры.");
+            UpdateContinueButton();
             return;
         }
 
-        PlayerPrefs.SetString(NameKey, newName);
-        PlayerPrefs.Save();
+        if (!CheckGameScene()) return;
+        LoadGameScene();
+    }
+
+    private bool CheckGameScene()
+    {
+        if (Application.CanStreamedLevelBeLoaded(gameSceneName)) return true;
+        ShowError("Сцена '" + gameSceneName + "' не добавлена в Build Profiles.");
+        return false;
+    }
+
+    private void LoadGameScene()
+    {
         Time.timeScale = 1f;
         SceneManager.LoadScene(gameSceneName);
     }
@@ -110,6 +146,7 @@ public class GameStartFlow : MonoBehaviour
     private void OnDestroy()
     {
         if (playButton != null) playButton.onClick.RemoveListener(OpenNameMenu);
+        if (continueButton != null) continueButton.onClick.RemoveListener(ContinueGame);
         if (confirmButton != null) confirmButton.onClick.RemoveListener(ConfirmNameAndStart);
         if (backButton != null) backButton.onClick.RemoveListener(BackToMainMenu);
         if (nameInput != null) nameInput.onValueChanged.RemoveListener(OnNameChanged);
