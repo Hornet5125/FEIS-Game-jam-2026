@@ -82,7 +82,6 @@ public class PlayerController2D : MonoBehaviour
 
         // Рывок в воздухе на Left Shift.
         if (Input.GetKeyDown(KeyCode.LeftShift)
-            && !isGrounded
             && canDash
             && !isDashing)
         {
