@@ -21,7 +21,13 @@ MonoBehaviour:
   m_ActivePlatformGuid: 
   m_AdditionalPlatformBuildSettings: []
   m_OverrideGlobalSceneList: 0
-  m_Scenes: []
+  m_Scenes:
+  - m_enabled: 1
+    m_path: Assets/Scenes/lvls/test_lvl.unity
+    m_guid: 9d59524299c64989cbd1bee39168903b
+  - m_enabled: 1
+    m_path: Assets/Scenes/lvls/test_smert.unity
+    m_guid: ee233e3db592ff55ca0334b37175fb29
   m_HasScriptingDefines: 0
   m_ScriptingDefines: []
   m_PlayerSettingsYaml:
