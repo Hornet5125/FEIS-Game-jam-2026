@@ -19,7 +19,7 @@ public class GameStartFlow : MonoBehaviour
     [SerializeField] private TMP_InputField nameInput;
     [SerializeField] private TMP_Text errorText;
 
-    private const string GameSceneName = "test_lvl";
+    private const string GameSceneName = "lvl1";
 
     private const string NameKey = "CharacterName";
     private const string HasGameKey = "HasStartedGame";

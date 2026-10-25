@@ -9,6 +9,7 @@ public class CameraFollow : MonoBehaviour
     [Header("Camera Settings")]
     [SerializeField] private float smoothSpeed = 8f;
     [SerializeField] private Vector3 offset = new Vector3(2f, 1f, -10f);
+    [SerializeField] private float heightOffset = 0f;
 
     [Header("Level Bounds")]
     [SerializeField] private Transform bottomLeft;
@@ -27,15 +28,19 @@ public class CameraFollow : MonoBehaviour
             return;
 
         Vector3 targetPosition = target.position + offset;
+        targetPosition.y += heightOffset;
         targetPosition.z = transform.position.z;
 
         targetPosition = ClampCameraPosition(targetPosition);
 
-        transform.position = Vector3.Lerp(
+        Vector3 smoothedPosition = Vector3.Lerp(
             transform.position,
             targetPosition,
             1f - Mathf.Exp(-smoothSpeed * Time.deltaTime)
         );
+
+        // Keep the visible camera area inside the bounds, even while smoothing.
+        transform.position = ClampCameraPosition(smoothedPosition);
     }
 
     private Vector3 ClampCameraPosition(Vector3 position)
