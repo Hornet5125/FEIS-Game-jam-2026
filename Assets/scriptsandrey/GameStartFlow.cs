@@ -19,8 +19,7 @@ public class GameStartFlow : MonoBehaviour
     [SerializeField] private TMP_InputField nameInput;
     [SerializeField] private TMP_Text errorText;
 
-    [Header("Scene")]
-    [SerializeField] private string gameSceneName = "game";
+    private const string GameSceneName = "test_lvl";
 
     private const string NameKey = "CharacterName";
     private const string HasGameKey = "HasStartedGame";
@@ -122,15 +121,17 @@ public class GameStartFlow : MonoBehaviour
 
     private bool CheckGameScene()
     {
-        if (Application.CanStreamedLevelBeLoaded(gameSceneName)) return true;
-        ShowError("Сцена '" + gameSceneName + "' не добавлена в Build Profiles.");
+        if (Application.CanStreamedLevelBeLoaded(GameSceneName)) return true;
+        ShowError("Сцена '" + GameSceneName + "' не добавлена в Build Profiles.");
         return false;
     }
 
     private void LoadGameScene()
     {
         Time.timeScale = 1f;
-        SceneManager.LoadScene(gameSceneName);
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+        SceneManager.LoadScene(GameSceneName, LoadSceneMode.Single);
     }
 
     private void ShowError(string message)
