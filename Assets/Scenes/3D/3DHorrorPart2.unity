@@ -359,9 +359,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NextLocationTrigger
   nextSceneName: test_lvl
   locationTitle: "\u0412 \u0420\u0415\u0410\u041B\u042C\u041D\u041E\u041C \u041C\u0418\u0420\u0415 \u0422\u042B \u041D\u0418\u041A\u041E\u041C\u0423 ..."
-  locationText: {fileID: 793742794}
   textDuration: 1.5
   playerTag: Player
+  locationText: {fileID: 793742794}
+  locationFont: {fileID: 11400000, guid: 833d8f321a9931b468eb7862f8f6b589, type: 2}
 --- !u!1 &341059142
 GameObject:
   m_ObjectHideFlags: 0
@@ -1839,7 +1840,7 @@ MonoBehaviour:
   m_OverrideVoxelSize: 0
   m_VoxelSize: 0.16666667
   m_MinRegionArea: 2
-  m_NavMeshData: {fileID: 23800000, guid: 54ede113bdf1a83ed8962d9964e211fb, type: 2}
+  m_NavMeshData: {fileID: 0}
   m_BuildHeightMesh: 0
 --- !u!1 &972410716
 GameObject:
