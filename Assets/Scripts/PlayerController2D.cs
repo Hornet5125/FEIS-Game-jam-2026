@@ -25,6 +25,19 @@ public class PlayerController2D : MonoBehaviour
     [SerializeField] private float dashSpeed = 18f;
     [SerializeField] private float dashDuration = 0.15f;
 
+    [Header("Animation")]
+    [SerializeField] private Animator animator;
+    [SerializeField] private SpriteRenderer characterSprite;
+    [SerializeField] private float landAnimationDuration = 0.2f;
+
+    private static readonly int IdleState = Animator.StringToHash("Idle");
+    private static readonly int RunState = Animator.StringToHash("Run");
+    private static readonly int JumpState = Animator.StringToHash("Jump");
+    private static readonly int FallState = Animator.StringToHash("Fall");
+    private static readonly int DashState = Animator.StringToHash("Dash");
+    private static readonly int LandState = Animator.StringToHash("Land");
+    private int currentAnimationState = -1;
+
     private Rigidbody2D rb;
     private BoxCollider2D bodyCollider;
 
@@ -39,6 +52,8 @@ public class PlayerController2D : MonoBehaviour
     private bool isGrounded;
     private bool isDashing;
     private bool canDash = true;
+    private bool wasAirborne;
+    private float landAnimationCounter;
 
     private Vector2 dashDirection;
     private MovingPlatform currentPlatform;
@@ -47,6 +62,12 @@ public class PlayerController2D : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         bodyCollider = GetComponent<BoxCollider2D>();
+
+        if (animator == null)
+            animator = GetComponentInChildren<Animator>();
+
+        if (characterSprite == null)
+            characterSprite = GetComponentInChildren<SpriteRenderer>();
 
         originalGravityScale = rb.gravityScale;
     }
@@ -60,6 +81,9 @@ public class PlayerController2D : MonoBehaviour
         {
             facingDirection = moveInput > 0f ? 1 : -1;
         }
+
+        if (characterSprite != null)
+            characterSprite.flipX = facingDirection < 0;
 
         // Буфер прыжка: позволяет нажать прыжок немного раньше приземления.
         if (Input.GetKeyDown(KeyCode.Space))
@@ -98,11 +122,46 @@ public class PlayerController2D : MonoBehaviour
                 StopDash();
             }
         }
+
+        UpdateAnimation();
+    }
+
+    private void UpdateAnimation()
+    {
+        if (animator == null)
+            return;
+
+        int nextState;
+
+        if (isDashing)
+            nextState = DashState;
+        else if (isGrounded && landAnimationCounter > 0f)
+            nextState = LandState;
+        else if (!isGrounded)
+            nextState = rb.linearVelocity.y > 0.1f ? JumpState : FallState;
+        else if (Mathf.Abs(rb.linearVelocity.x) > 0.1f)
+            nextState = RunState;
+        else
+            nextState = IdleState;
+
+        if (nextState != currentAnimationState)
+        {
+            currentAnimationState = nextState;
+            animator.Play(nextState, 0, 0f);
+        }
     }
 
     private void FixedUpdate()
     {
         CheckGrounded();
+
+        if (isGrounded && wasAirborne && !isDashing)
+            landAnimationCounter = landAnimationDuration;
+
+        wasAirborne = !isGrounded;
+
+        if (landAnimationCounter > 0f)
+            landAnimationCounter = Mathf.Max(0f, landAnimationCounter - Time.fixedDeltaTime);
 
         if (isGrounded)
         {
@@ -234,6 +293,9 @@ public class PlayerController2D : MonoBehaviour
         }
 
         isDashing = false;
+        currentAnimationState = -1;
+        wasAirborne = false;
+        landAnimationCounter = 0f;
     }
 
     private void OnDrawGizmosSelected()
