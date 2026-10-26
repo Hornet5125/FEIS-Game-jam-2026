@@ -315,8 +315,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: New Text
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 833d8f321a9931b468eb7862f8f6b589, type: 2}
+  m_sharedMaterial: {fileID: 7790835201120358520, guid: 833d8f321a9931b468eb7862f8f6b589, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -920,26 +920,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee840db9c0797c4cfadff2700eebd5b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogueManager
-  dialogueImage: {fileID: 0}
-  characterName: {fileID: 547856295}
-  dialogueText: {fileID: 224075923}
-  backgroundImage: {fileID: 1406984020}
-  fileName: Dialogue/Scene01
-  lines: []
-  currentLine: 0
-  currentSpeaker: 
-  letterDelay: 0.04
-  isTyping: 0
-  fullText: 
-  fadeImage: {fileID: 609758383}
-  fadeDuration: 0.5
-  isChangingBackground: 0
-  choicesPanel: {fileID: 1935435047}
-  choiceButton1: {fileID: 792064845}
-  choiceButton2: {fileID: 433050829}
-  option1Label: 
-  option2Label: 
-  isShowingChoices: 0
 --- !u!1 &792064843
 GameObject:
   m_ObjectHideFlags: 0
@@ -1072,6 +1052,7 @@ GameObject:
   - component: {fileID: 1243446083}
   - component: {fileID: 1243446082}
   - component: {fileID: 1243446081}
+  - component: {fileID: 1243446084}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -1122,7 +1103,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 5
+  orthographic size: 5.4
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -1153,6 +1134,50 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1243446084
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1243446080}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.UniversalAdditionalCameraData
+  m_RenderShadows: 1
+  m_RequiresDepthTextureOption: 2
+  m_RequiresOpaqueTextureOption: 2
+  m_CameraType: 0
+  m_Cameras: []
+  m_RendererIndex: -1
+  m_VolumeLayerMask:
+    serializedVersion: 2
+    m_Bits: 1
+  m_VolumeTrigger: {fileID: 0}
+  m_VolumeFrameworkUpdateModeOption: 2
+  m_RenderPostProcessing: 0
+  m_Antialiasing: 0
+  m_AntialiasingQuality: 2
+  m_StopNaN: 0
+  m_Dithering: 0
+  m_ClearDepth: 1
+  m_AllowXRRendering: 1
+  m_AllowHDROutput: 1
+  m_UseScreenCoordOverride: 0
+  m_ScreenSizeOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_ScreenCoordScaleBias: {x: 0, y: 0, z: 0, w: 0}
+  m_RequiresDepthTexture: 0
+  m_RequiresColorTexture: 0
+  m_TaaSettings:
+    m_Quality: 3
+    m_FrameInfluence: 0.1
+    m_JitterScale: 1
+    m_MipBias: 0
+    m_VarianceClampScale: 0.9
+    m_ContrastAdaptiveSharpening: 0
+  m_Version: 2
 --- !u!1 &1350088041
 GameObject:
   m_ObjectHideFlags: 0
@@ -1246,17 +1271,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee840db9c0797c4cfadff2700eebd5b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogueScript
-  dialogueImage: {fileID: 675038322}
-  characterName: {fileID: 547856295}
-  dialogueText: {fileID: 224075923}
-  backgroundImage: {fileID: 1406984020}
-  fileName: Dialogue/Scene01
-  letterDelay: 0.04
-  fadeImage: {fileID: 609758383}
-  fadeDuration: 0.5
-  choicesPanel: {fileID: 1935435047}
-  choiceButton1: {fileID: 792064845}
-  choiceButton2: {fileID: 433050829}
 --- !u!114 &1350088046
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1528,7 +1542,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 7.7072144, y: -4.281708}
+  m_AnchoredPosition: {x: 7.7072754, y: -4.2817383}
   m_SizeDelta: {x: 15.4143, y: 8.5635}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1935435049
