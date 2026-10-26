@@ -1,4 +1,4 @@
-
+﻿
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -190,9 +190,17 @@ public class DialogueScript : MonoBehaviour
                 continue;
             }
 
-            if (line == "@Pause")
+            if (line == "@Pause" || line.StartsWith("@Pause "))
             {
-                StartCoroutine(PauseForFiveSeconds());
+                float seconds = 5f;
+                string argument = line.Substring("@Pause".Length).Trim();
+                if (!string.IsNullOrEmpty(argument))
+                {
+                    if (!float.TryParse(argument, System.Globalization.NumberStyles.Float,
+                        System.Globalization.CultureInfo.InvariantCulture, out seconds))
+                        seconds = 5f;
+                }
+                StartCoroutine(PauseForSeconds(Mathf.Max(0f, seconds)));
                 return;
             }
 
@@ -503,11 +511,11 @@ public class DialogueScript : MonoBehaviour
         Debug.Log("Интерфейс диалога показан.");
     }
 
-    IEnumerator PauseForFiveSeconds()
+    IEnumerator PauseForSeconds(float seconds)
     {
         isPaused = true;
 
-        yield return new WaitForSecondsRealtime(5f);
+        yield return new WaitForSecondsRealtime(seconds);
 
         isPaused = false;
 

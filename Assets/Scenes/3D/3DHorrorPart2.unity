@@ -357,7 +357,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a74ffebe2274a2bf289a060009bbc6e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NextLocationTrigger
-  nextSceneName: test_lvl
+  nextSceneName: posle
   locationTitle: "\u0412 \u0420\u0415\u0410\u041B\u042C\u041D\u041E\u041C \u041C\u0418\u0420\u0415 \u0422\u042B \u041D\u0418\u041A\u041E\u041C\u0423 ..."
   textDuration: 1.5
   playerTag: Player
