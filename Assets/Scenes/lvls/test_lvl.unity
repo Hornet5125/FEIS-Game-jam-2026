@@ -364,11 +364,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 01a3034015ba428379e7ac2c3eaa2005, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraFollow
-  target: {fileID: 1889512736}
-  smoothSpeed: 8
-  offset: {x: 2, y: 1, z: -10}
-  bottomLeft: {fileID: 1911594880}
-  topRight: {fileID: 1088938313}
 --- !u!114 &391424130
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1010,7 +1005,6 @@ GameObject:
   - component: {fileID: 1889512735}
   - component: {fileID: 1889512734}
   - component: {fileID: 1889512733}
-  - component: {fileID: 1889512737}
   - component: {fileID: 1889512738}
   - component: {fileID: 1889512739}
   m_Layer: 0
@@ -1168,32 +1162,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1889512737
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1889512732}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 94af765d79db408c68e59a952e2b9bc1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerController2D
-  maxSpeed: 8
-  acceleration: 70
-  deceleration: 90
-  sprintSpeed: 13
-  jumpForce: 15
-  coyoteTime: 0.1
-  jumpBufferTime: 0.12
-  jumpCutMultiplier: 0.5
-  groundLayer:
-    serializedVersion: 2
-    m_Bits: 320
-  groundCheckDistance: 0.1
-  dashSpeed: 18
-  dashDuration: 0.15
 --- !u!114 &1889512738
 MonoBehaviour:
   m_ObjectHideFlags: 0
